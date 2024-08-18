@@ -1,14 +1,33 @@
 import axios from "axios";
-import { createResource, Match, Show, Switch } from "solid-js";
+import { createResource, createSignal, Match, Show, Switch } from "solid-js";
+import { Transition, TransitionGroup } from "solid-transition-group";
+import './fetching.css'
 
 export default function Fetching() {
+
+    const [show, toggleShow] = createSignal(true)
+    //TODO: animation on start?
+
     return (
         <>
             <section class="bg-pink-100 text-gray-700 p-8">
                 <h1 class="text-2xl font-bold">Fetching experiments</h1>
-                <p class="mt-4">
-                    We love data fetching
-                </p>
+                <button onclick={() => toggleShow(!show())} type="button">{show() ? 'Trust you' : 'Prove!'}</button>
+                {
+                    show() && <span>{' '}Proving...</span>
+                }
+                <TransitionGroup name="slide-fade" appear>
+                    {
+                        show() && (
+                            <>
+                        <p class="mt-4 container">
+                            We love data fetching
+                        </p>
+                        <p>So much</p>
+                        </>)
+                    }
+
+                </TransitionGroup>
             </section>
             <section>
                 <h1 class="text-2xl font-bold">Textbook example</h1>
@@ -17,18 +36,23 @@ export default function Fetching() {
                 <WrapFetching
                     name="call1"
                     fetchCall={fetchCall1}
-                    onFetched={call1 => <>
-                        <div data-testid="call1-result">{call1.action}: {call1.value}</div>
+                    onFetched={call1 => <div>
+                        <Transition name="slide-fade" appear>
+                            <div data-testid="call1-result">{call1.action}: {call1.value}</div>
+                        </Transition>
                         <WrapFetching
                             name="call2"
                             fetchCall={() => fetchCall2(call1.value)}
                             onFetched={call2 => <>
-                                <div data-testid="call2-result">{call2.action}: {call2.value}</div>                                
+                                <Transition name="slide-fade" appear>
+                                    <div data-testid="call2-result">{call2.action}: {call2.value}</div>
+                                </Transition>
                             </>}
                         />
-
-                    </>}
-                 />
+                        </div>
+                    
+                    }
+                />
 
             </section>
         </>
@@ -45,14 +69,20 @@ function WrapFetching<T>(props: {
     return (
         <div>
             <Show when={call.loading}>
-                <p data-testid={`${props.name}-pending`}>{props.name} Loading...</p>
+                <Transition name="fade" appear>
+                    <p data-testid={`${props.name}-pending`}>{props.name} Loading...</p>
+                </Transition> 
             </Show>
             <Switch>
                 <Match when={call.error}>
-                    <span data-testid={`${props.name}-err`}>Error: {call.error.message}</span>
+                    <Transition name="bounce" appear>
+                        <div>
+                            <span data-testid={`${props.name}-err`}>Error: {call.error.message}</span>
+                        </div>
+                    </Transition>
                 </Match>
                 <Match when={call()}>
-                    {props.onFetched(call())}
+                        {props.onFetched(call())}
                 </Match>
             </Switch>
         </div>
@@ -84,7 +114,7 @@ function DoFetching() {
 
 const fetchCall2 = async (target: string) => (await axios.get(`/api/${target}`)).data;
 
-function DoSecondFetching({target}: {target: string}) {
+function DoSecondFetching({ target }: { target: string }) {
     const [call2] = createResource(() => fetchCall2(target));
 
     return (
