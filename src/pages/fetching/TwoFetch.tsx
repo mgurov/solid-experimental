@@ -4,9 +4,8 @@ export default function GuidesFetchingData() {
     return (
         <>
             <section class="bg-pink-100 text-gray-700 p-8">
-                <DependentFetch_Nested />
-                <DependentFetch />
-                
+                <DependentFetch_ExtraComponent2 />
+
             </section>
         </>
     )
@@ -19,6 +18,49 @@ const fetchUser = async (id: string) => {
     }
     await new Promise((r) => setTimeout(r, 500))
     return response.json();
+}
+
+function DependentFetch_ExtraComponent2() {
+    const [user1] = createResource(() => fetchUser("1"));
+    const [user2] = createResource(user1, (u) => fetchUser(u.mass));
+
+    return (
+        <div>
+            <div>
+                User1:
+                <Switch>
+                    <Match when={user1.loading}>Loading...</Match>
+                    <Match when={user1.error}>
+                        <span data-testid="error">Error: {user1.error.message}</span>
+                    </Match>
+                    <Match when={user1()}>
+                        <div data-testid="result">{JSON.stringify(user1())}</div>
+                        <DependentFetch_ExtraComponent2_D user2={user2} />
+                    </Match>
+                </Switch>
+            </div>
+            <div>
+            </div>
+        </div>
+    );
+}
+
+function DependentFetch_ExtraComponent2_D(props: { user2: any }) {
+    return (
+        <div>
+            User2:
+            <Switch>
+                <Match when={props.user2.loading}>Loading...</Match>
+                <Match when={props.user2.error}>
+                    <span data-testid="error">Error: {props.user2.error.message}</span>
+                </Match>
+                <Match when={props.user2()}>
+                    <div data-testid="result">{JSON.stringify(props.user2())}</div>
+                </Match>
+            </Switch>
+
+        </div>
+    );
 }
 
 function DependentFetch() {
@@ -71,20 +113,21 @@ function DependentFetch_Nested() {
                     </Match>
                     <Match when={user1()}>
                         <div data-testid="result">{JSON.stringify(user1())}</div>
+                        User2:
+                        <Switch>
+                            <Match when={user2.loading}>Loading...</Match>
+                            <Match when={user2.error}>
+                                <span data-testid="error">Error: {user2.error.message}</span>
+                            </Match>
+                            <Match when={user2()}>
+                                <div data-testid="result">{JSON.stringify(user2())}</div>
+                            </Match>
+                        </Switch>
+
                     </Match>
                 </Switch>
             </div>
             <div>
-                User2:
-                <Switch>
-                    <Match when={user2.loading}>Loading...</Match>
-                    <Match when={user2.error}>
-                        <span data-testid="error">Error: {user2.error.message}</span>
-                    </Match>
-                    <Match when={user2()}>
-                        <div data-testid="result">{JSON.stringify(user2())}</div>
-                    </Match>
-                </Switch>
             </div>
         </div>
     );
