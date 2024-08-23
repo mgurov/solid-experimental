@@ -1,15 +1,16 @@
-import { createEffect, createResource, createSignal, Match, Show, Suspense, Switch } from "solid-js";
+import { createResource, Match, Switch } from "solid-js";
 
 export default function GuidesFetchingData() {
     return (
         <>
             <section class="bg-pink-100 text-gray-700 p-8">
-                <DependentFetch_ExtraComponent2 />
-
+                <DependentFetch />
             </section>
         </>
     )
 }
+
+const startingUser = "1"
 
 const fetchUser = async (id: string) => {
     const response = await fetch(`https://swapi.dev/api/people/${id}/`);
@@ -21,8 +22,7 @@ const fetchUser = async (id: string) => {
 }
 
 function DependentFetch_ExtraComponent2() {
-    const [user1] = createResource(() => fetchUser("1"));
-    const [user2] = createResource(user1, (u) => fetchUser(u.mass));
+    const [user1] = createResource(() => fetchUser(startingUser));
 
     return (
         <div>
@@ -35,7 +35,7 @@ function DependentFetch_ExtraComponent2() {
                     </Match>
                     <Match when={user1()}>
                         <div data-testid="result">{JSON.stringify(user1())}</div>
-                        <DependentFetch_ExtraComponent2_D user2={user2} />
+                        <DependentFetch_ExtraComponent2_D user1={user1} />
                     </Match>
                 </Switch>
             </div>
@@ -45,17 +45,19 @@ function DependentFetch_ExtraComponent2() {
     );
 }
 
-function DependentFetch_ExtraComponent2_D(props: { user2: any }) {
+function DependentFetch_ExtraComponent2_D(props: { user1: any }) {
+    const [user2] = createResource(props.user1, (u) => fetchUser(u.mass));
+
     return (
         <div>
             User2:
             <Switch>
-                <Match when={props.user2.loading}>Loading...</Match>
-                <Match when={props.user2.error}>
-                    <span data-testid="error">Error: {props.user2.error.message}</span>
+                <Match when={user2.loading}>Loading...</Match>
+                <Match when={user2.error}>
+                    <span data-testid="error">Error: {user2.error.message}</span>
                 </Match>
-                <Match when={props.user2()}>
-                    <div data-testid="result">{JSON.stringify(props.user2())}</div>
+                <Match when={user2()}>
+                    <div data-testid="result">{JSON.stringify(user2())}</div>
                 </Match>
             </Switch>
 
@@ -65,7 +67,7 @@ function DependentFetch_ExtraComponent2_D(props: { user2: any }) {
 
 function DependentFetch() {
 
-    const [user1] = createResource(() => fetchUser("1"));
+    const [user1] = createResource(() => fetchUser(startingUser));
     const [user2] = createResource(user1, (u) => fetchUser(u.mass));
 
     return (
@@ -99,7 +101,7 @@ function DependentFetch() {
 }
 
 function DependentFetch_Nested() {
-    const [user1] = createResource(() => fetchUser("1"));
+    const [user1] = createResource(() => fetchUser(startingUser));
     const [user2] = createResource(user1, (u) => fetchUser(u.mass));
 
     return (
