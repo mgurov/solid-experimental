@@ -19,6 +19,10 @@ export const routes: RouteDefinition[] = [
     component: lazy(() => import('./pages/fetching')),
   },
   {
+    path: '/fetching-two',
+    component: lazy(() => import('./pages/fetching/TwoFetch')),
+  },
+  {
     path: '/fetching/guides/fetching-data',
     component: lazy(() => import('./pages/fetching/GuidesFetchingData')),
   },
