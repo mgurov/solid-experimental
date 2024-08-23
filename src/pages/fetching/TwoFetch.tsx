@@ -15,13 +15,14 @@ const fetchUser = async (id: string) => {
     if (!response.ok) {
         throw new Error(`Response nok ${response.status} ${response.statusText}`)
     }
+    await new Promise((r) => setTimeout(r, 500))
     return response.json();
 }
 
 function App() {
 
     const [user1] = createResource(() => fetchUser("1"));
-    const [user2] = createResource(() => fetchUser("2"));
+    const [user2] = createResource(user1, (u) => fetchUser(u.mass));
 
     return (
         <div>
