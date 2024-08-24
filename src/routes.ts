@@ -31,6 +31,10 @@ export const routes: RouteDefinition[] = [
     component: lazy(() => import('./pages/fetching/GuidesFetchingDataAxios')),
   },
   {
+    path: '/context/nested-contexts',
+    component: lazy(() => import('./pages/context/NestedContexts')),
+  },
+  {
     path: '**',
     component: lazy(() => import('./errors/404')),
   },
