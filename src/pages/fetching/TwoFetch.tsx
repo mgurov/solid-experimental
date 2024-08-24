@@ -35,7 +35,7 @@ function DependentFetch_ExtraComponent2() {
                     </Match>
                     <Match when={user1()}>
                         <div data-testid="result">{JSON.stringify(user1())}</div>
-                        <DependentFetch_ExtraComponent2_D user1={user1} />
+                        <DependentFetch_ExtraComponent2_D user1={user1()} />
                     </Match>
                 </Switch>
             </div>
@@ -68,7 +68,9 @@ function DependentFetch_ExtraComponent2_D(props: { user1: any }) {
 function DependentFetch() {
 
     const [user1] = createResource(() => fetchUser(startingUser));
-    const [user2] = createResource(user1, (u) => fetchUser(u.mass));
+    //const userMass = () => { try {return user1()?.mass} catch (e) {console.warn('caught', e); return "42"}}
+    const userMass = () => { if (user1.error || user1.loading) {return undefined;} return user1()?.mass;}
+    const [user2] = createResource(userMass, fetchUser);
 
     return (
         <div>
