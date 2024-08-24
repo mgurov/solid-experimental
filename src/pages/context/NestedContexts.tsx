@@ -5,7 +5,13 @@ export default function GuidesFetchingData() {
         <>
             <section class="bg-pink-100 text-gray-700 p-8">
                 <TreeProvider name="root">
-                    <TreeNoder />
+                    <TreeProvider name="branch_a">
+                        <TreeNoder ></TreeNoder>
+                    </TreeProvider>
+                    <TreeNoder></TreeNoder>
+                    <TreeProvider name="branch_b">
+                        <TreeNoder ></TreeNoder>
+                    </TreeProvider>
                 </TreeProvider>
             </section>
         </>
