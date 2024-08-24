@@ -1,15 +1,22 @@
-import { createContext, JSX } from "solid-js"
+import { createContext, JSX, useContext } from "solid-js"
 
 export default function GuidesFetchingData() {
     return (
         <>
             <section class="bg-pink-100 text-gray-700 p-8">
                 <TreeProvider name="root">
-                    Here be root
+                    <TreeNoder />
                 </TreeProvider>
             </section>
         </>
     )
+}
+
+function TreeNoder(props: {children?: JSX.Element}) {
+    const node = useTree()
+    return (
+        <> <span>{node.name}</span> {props.children} </>
+    );
 }
 
 type TreeNode = {
@@ -28,4 +35,8 @@ export function TreeProvider(props: {name: string, path?: string[], children: JS
             {props.children}
         </TreeContext.Provider>
     )
+}
+
+export function useTree() {
+    return useContext(TreeContext);
 }
